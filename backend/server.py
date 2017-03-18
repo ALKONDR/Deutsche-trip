@@ -1,5 +1,5 @@
 import urllib
-from flask import abort, request, Flask, redirect
+from flask import abort, request, Flask, redirect, jsonify
 import requests
 import json
 import pandas as pd
@@ -22,10 +22,11 @@ def deutsche_callback():
     return db.transactions_stats(db.get_transactions(access_token))
 
 
+# get list of countries
 @app.route('/api/countries')
 def get_countries():
     countries = json.load(open('countriesToCities.json'))
-    return 'o'
+    return jsonify(sorted(list(countries.keys())))
 
 if __name__ == "__main__":
     app.run()
