@@ -1,6 +1,7 @@
 import urllib
 import requests
 import json
+import datetime
 #import pandas as pd
 
 client_id = 'c6605622c4714d6f802a6f3857fd8afb'
@@ -32,6 +33,18 @@ def get_token(code):
     return token_json["access_token"], token_json['user']['id'], token_json['user']['username']
 
 
-def get_photos(access_token, fr, to):
-
-    return 0
+# get photos from given period
+def get_photos(userid, access_token, fr, to):
+    media_url = 'https://api.instagram.com/v1/users/'+ userid + '/media/recent/?'
+    params = {'access_token': access_token}
+    response = requests.get(media_url, params=params)
+    response = response.json()['data']
+    photos = []
+    for photo in response:
+        date = datetime.date.fromtimestamp(int(photo['created_time']))
+        if (date >= fr) and (date <= to):
+            photos.append({'photo_url' : photo['images']['standard_resolution']['url'], 
+                'width' : photo['images']['standard_resolution']['width'],
+                'height' : photo['images']['standard_resolution']['height'],
+                'link' : photo['link']})
+    return photos

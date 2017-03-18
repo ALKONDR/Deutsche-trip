@@ -5,6 +5,7 @@ import requests
 import json
 import pandas as pd
 from services import api_deutsche as db, api_instagram as inst
+import datetime
 
 app = Flask(__name__)
 app.config['SESSION_TYPE'] = 'memcached'
@@ -56,6 +57,28 @@ def get_countries():
     return jsonify(sorted(list(countries.keys())))
 
 
+@app.route('/api/status')
+def get_apistatus():
+	s = {}
+	if 'db_token' in flask.session:
+		s['deutsche_status'] = True
+	else:
+		s['deutsche_status'] = False
+	if 'inst_token' in flask.session:
+		s['instagram_status'] = True
+		s['instagram_username'] = flask.session['inst_username']
+	else:
+		s['instagram_status'] = False
+	return jsonify(s)
+
+# get JSON of user's photos in the selected period
+@app.route('/api/instagram/photos/<fr>/<to>')
+def inst_get_photos(fr, to):
+	fr = datetime.date(int(fr[0:4]), int(fr[4:6]), int(fr[6:8]))
+	to = datetime.date(int(to[0:4]), int(to[4:6]), int(to[6:8]))
+	p = inst.get_photos(flask.session['inst_userid'], flask.session['inst_token'], fr, to)
+	return jsonify(p)
+
 @app.route('/api/instagram')
 def inst_auth():
 	return redirect(inst.make_authorization_url())
@@ -70,6 +93,7 @@ def inst_callback():
     	flask.session['inst_token'], flask.session['inst_userid'], flask.session['inst_username']  = inst.get_token(code)
     #inst_token = inst.get_token(code)
     return redirect('/')
+
 
 
 if __name__ == "__main__":
