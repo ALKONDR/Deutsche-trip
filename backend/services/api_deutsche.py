@@ -1,12 +1,11 @@
 import urllib
-from flask import abort, request, Flask, redirect
 import requests
 import json
 import pandas as pd
 
 client_id = 'aff8e8e9-0f5d-4fb7-8f9f-ce19fbef6b5c'
 client_secret = json.load(open('secret.json'))['client_secret']
-redirect_uri = "http://127.0.0.1:5000/callback"
+redirect_uri = "http://127.0.0.1:5000/api/deutsche/callback"
 base_url = "https://simulator-api.db.com/gw/oidc/authorize"
 
 
@@ -15,7 +14,6 @@ def make_authorization_url():
               "response_type": "code",
               "state": redirect_uri,
               "redirect_uri": redirect_uri}
-    import urllib
     url = base_url + "?" + urllib.parse.urlencode(params)
     return url
 
