@@ -38,6 +38,8 @@ const getDateQuery = (rawData) => {
 	return tmp[2] + month2Num[tmp[1]] + (tmp[0] < 10 ? '0' + tmp[0] : tmp[0]);
 }
 
+var currentId = undefined;
+
 const rawFactory = (photos) => {
 
 	let carousel = document.createElement("div");
@@ -61,12 +63,19 @@ const rawFactory = (photos) => {
 	trans.className = "waves-effect waves-teal btn-flat";
 	let text = document.createTextNode("Transactions");
 	trans.appendChild(text);
+	trans.href = '#' + currentId;
+
+	let main = document.getElementById('main');
+	main.appendChild(carousel);
+	main.appendChild(trans);
 }
 
 const tableFactory = (payments) => {
 	let modal = document.createElement('div');
 	modal.className = 'modal';
 	modal.id = 'table' + String(payments.sum);
+
+	currentId = modal.id;
 
 	let content = document.createElement('div');
 	content.className = 'modal-content';
@@ -80,15 +89,67 @@ const tableFactory = (payments) => {
 	let thread = document.createElement('thread');
 	let trHead = document.createElement('tr');
 
-	let th1 = document.createElement('th');
-	let th2 = document.createElement('th');
-	let th3 = document.createElement('th');
+	let thAmount = document.createElement('th');
+	let thDate = document.createElement('th');
+	let thCounterparty = document.createElement('th');
 
-	
-}
+	let textAmount = document.createTextNode('Amount');
+	let textDate = document.createTextNode('Date');
+	let textCounterparty = document.createElement('Counterparty');
 
-const fillTable = (payments) => {
+	thAmount.appendChild(textAmount);
+	thDate.appendChild(textDate);
+	thCounterparty.appendChild(textCounterparty);
 
+	trHead.appendChild(thAmount);
+	trHead.appendChild(thDate);
+	trHead.appendChild(thCounterparty);
+
+	thread.appendChild(trHead);
+
+	table.appendChild(thread);
+
+	let tbody = document.createElement('tbody');
+
+	payments.transactions.forEach(trans => {
+		let trEl = document.createElement('tr');
+		let tdAmount = document.createElement('td');
+		let tdDate = document.createElement('td');
+		let tdCounterparty = document.createElement('td');
+
+		let txtAmount = document.createTextNode(trans.amount);
+		let txtDate = document.createTextNode(trans.bookingDate);
+		let txtCounterparty = document.createElement(trans.counterPartyName);
+
+		tdAmount.appendChild(txtAmount);
+		tdDate.appendChild(txtDate);
+		tdCounterparty.appendChild(txtCounterparty);
+
+		trEl.appendChild(tdAmount);
+		trEl.appendChild(tdDate);
+		trEl.appendChild(tdCounterparty);
+
+		tbody.appendChild(trEl);
+	});
+
+	table.appendChild(tbody);
+
+	content.appendChild(table);
+
+	modal.appendChild(content);
+
+	let footer = document.createElement('div');
+	footer.className = 'modal-footer';
+	let cancel = document.createElement('a');
+	cancel.className = 'modal-action modal-close waves-effect waves-red btn-flat';
+	let txtCancel = document.createTextNode('Cancel');
+	cancel.appendChild(txtCancel);
+	footer.appendChild(cancel);
+
+	modal.appendChild(footer);
+
+	let body = document.getElementById('body');
+	body.appendChild(modal);
 }
 
 const saveAndClose = () => {
@@ -121,8 +182,8 @@ const saveAndClose = () => {
 
 	});
 
+	tableFactory(payments);
 	rawFactory(photos);
-
 
 	$('#addModal').modal('close');
 }
