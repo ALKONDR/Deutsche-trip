@@ -8,3 +8,6 @@ Everything is now at `http://localhost:5000/`
 * `/api/status` - get JSON of API statuses:
 * `/api/countries` - list of countries
 * `/api/clear_session` - clears session (temporary solution of token expiration)
+
+
+In case of problems with `flickrapi`, follow <a href="https://github.com/sybrenstuvel/flickrapi/issues/75">this</a> link.
