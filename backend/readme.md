@@ -9,6 +9,6 @@ Everything is now at `http://localhost:5000/`
 * `/api/countries` - list of countries
 * `/api/clear_session` - clears session (temporary solution of token expiration)
 * `/api/flickr_get_photos/Country/Season` - get photos for future trips
-* `/api/get_photos_any` - get photos no matter which dates these are. It will be either instagram for past trips or flickr photos for future ones.
+* `/api/get_photos_any/Country/YYYYMMDD/YYYYMMDD` - get photos no matter which dates these are. It will be either instagram for past trips or flickr photos for future ones.
 
 In case of problems with `flickrapi`, follow <a href="https://github.com/sybrenstuvel/flickrapi/issues/75">this</a> link.
