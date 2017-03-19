@@ -80,3 +80,7 @@ td {
 .money:hover, .photos:hover {
 	font-weight: bold;
 }
+
+.carusel {
+	height: 50%;
+}
