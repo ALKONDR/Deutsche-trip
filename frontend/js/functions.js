@@ -63,6 +63,34 @@ const rawFactory = (photos) => {
 	trans.appendChild(text);
 }
 
+const tableFactory = (payments) => {
+	let modal = document.createElement('div');
+	modal.className = 'modal';
+	modal.id = 'table' + String(payments.sum);
+
+	let content = document.createElement('div');
+	content.className = 'modal-content';
+
+	let h4 = document.createElement('div');
+
+	content.appendChild(h4);
+
+	let table = document.createElement('table');
+	table.className = 'striped';
+	let thread = document.createElement('thread');
+	let trHead = document.createElement('tr');
+
+	let th1 = document.createElement('th');
+	let th2 = document.createElement('th');
+	let th3 = document.createElement('th');
+
+	
+}
+
+const fillTable = (payments) => {
+
+}
+
 const saveAndClose = () => {
 
 	let country = document.getElementById('autocomplete-input');
@@ -92,6 +120,9 @@ const saveAndClose = () => {
 	}).done(() => {
 
 	});
+
+	rawFactory(photos);
+
 
 	$('#addModal').modal('close');
 }
