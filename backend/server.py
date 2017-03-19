@@ -4,7 +4,7 @@ import flask
 import requests
 import json
 import pandas as pd
-from services import api_deutsche as db, api_instagram as inst
+from services import api_deutsche as db, api_instagram as inst, api_flickr as flickr
 import datetime
 
 app = Flask(__name__)
@@ -130,6 +130,29 @@ def inst_callback():
     return redirect('/')
 
 
+@app.route('/api/flickr/photos/<country>/<season>/')
+def flickr_get_photos(country, season):
+	p = flickr.get_images(country, season, 5)
+	resp = jsonify(p)
+	resp.headers.add('Access-Control-Allow-Origin', '*')
+	return resp
+
+@app.route('/api/get_photos_any/<country>/<fr>/<to>')
+def get_photos_any(country, fr, to):
+	to_date = datetime.date(int(to[0:4]), int(to[4:6]), int(to[6:8]))
+	
+	if to_date < datetime.date.today():
+		return inst_get_photos(fr, to)
+	else:
+		month_from = int(fr[4:6])
+		season = 'Winter'
+		if month_from in [3,4,5]:
+			season = 'Spring'
+		elif month_from in [6,7,8]:
+			season = 'Summer'
+		elif month_from in [9,10,11]:
+			season = 'Fall'
+		return flickr_get_photos(country, season)
 
 if __name__ == "__main__":
     app.run()
