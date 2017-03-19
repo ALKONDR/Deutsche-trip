@@ -59,11 +59,24 @@ header {
 
 .main {
 	font-family: Arial;
-	padding: 20px 70px 0px 70px;
+	padding: 3% 7% 3px 7%;
 	position: relative;
 	font-size: 15px;
+	margin-bottom: 5%;
 }
 
 .tab {
 	width: 31.5%;
+}
+
+td {
+	transition: font-weight 0.2s;
+}
+
+.money, .photos {
+	cursor: pointer;
+}
+
+.money:hover, .photos:hover {
+	font-weight: bold;
 }

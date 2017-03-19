@@ -1,6 +1,7 @@
 $(document).ready(() => {
 	$('.parallax').parallax();
 	$('.modal').modal();
+	$('.carousel.carousel-slider').carousel({fullWidth: true});
 	$('.datepicker').pickadate({
 		selectMonths: true,
 		selectYears: 15
@@ -24,5 +25,5 @@ $(document).ready(() => {
 		});
 	});
 
-	
+
 });
