@@ -1,5 +1,5 @@
 import urllib
-from flask import abort, request, Flask, redirect, jsonify, Session
+from flask import abort, request, Flask, redirect, jsonify, Session, session
 import flask
 import requests
 import json
@@ -10,7 +10,6 @@ import datetime
 app = Flask(__name__)
 app.config['SESSION_TYPE'] = 'memcached'
 app.config['SECRET_KEY'] = 'super secret key'
-sess = Session()
 
 
 @app.route('/')
@@ -33,6 +32,12 @@ def homepage():
 	return s
 
 
+@app.route('/clear_session')
+def clear_session():
+	session.clear()
+	return redirect('/')
+
+
 # Authorization
 @app.route("/api/deutsche")
 def deutsche_auth():
@@ -50,11 +55,35 @@ def deutsche_callback():
     #print db.transactions_stats(db.get_transactions(access_token))
     return redirect('/')
 
+# @app.route('/api/deutsche/transactions')
+# def deutsche_transactions():
+# 	return jsonify(db.get_transactions(flask.session['db_token']))
+
+@app.route('/api/deutsche/transactions')
+@app.route('/api/deutsche/transactions/<fr>/<to>')
+def deutsche_transactions(fr = None, to = None):
+	transactions = db.get_transactions(flask.session['db_token'])
+	s = 0
+	selected_transactions = {'transactions':[], 'sum':0}
+	for i in transactions.keys():
+		t = transactions[i]
+		print(t)
+		d = datetime.date(int(t['bookingDate'][0:4]), int(t['bookingDate'][5:7]), int(t['bookingDate'][8:10]))
+		if (fr is None or ((d >= fr) and (d <= to))) and (t['amount'] < 0):
+			s += t['amount']
+			selected_transactions['transactions'].append(t)
+	selected_transactions['sum'] = s
+	return jsonify(selected_transactions)
+
+
 # get list of countries
 @app.route('/api/countries')
 def get_countries():
     countries = json.load(open('countriesToCities.json'))
-    return jsonify(sorted(list(countries.keys())))
+
+    resp = flask.Response(sorted(list(countries.keys())))
+    resp.headers['Access-Control-Allow-Origin'] = 'http://localhost:8080'
+    return resp
 
 
 @app.route('/api/status')

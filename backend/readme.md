@@ -6,3 +6,4 @@ Everything is now at `http://localhost:5000/`
 * `/api/instagram/photos/YYYYMMDD/YYYYMMDD` - get photos from Instagram during specified period
 * `/api/status` - get JSON of API statuses:
 * `/api/countries` - list of countries
+* `/api/clear_session` - clears session (temporary solution of token expiration)

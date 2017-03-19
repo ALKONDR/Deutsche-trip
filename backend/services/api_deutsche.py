@@ -42,6 +42,7 @@ def get_cashAccounts(access_token):
     return response
 
 
+# get all of user transactions 
 def get_transactions(access_token):
     trans_url = 'https://simulator-api.db.com/gw/dbapi/v1/transactions'
     headers = {"Authorization": "bearer " + access_token}
