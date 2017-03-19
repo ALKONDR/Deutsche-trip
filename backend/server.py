@@ -143,7 +143,7 @@ def get_photos_any(country, fr, to):
 	to_date = datetime.date(int(to[0:4]), int(to[4:6]), int(to[6:8]))
 	
 	if to_date < datetime.date.today():
-		return inst_get_photos(fr, to)
+		resp = inst_get_photos(fr, to)
 	else:
 		month_from = int(fr[4:6])
 		season = 'Winter'
@@ -153,7 +153,9 @@ def get_photos_any(country, fr, to):
 			season = 'Summer'
 		elif month_from in [9,10,11]:
 			season = 'Fall'
-		return flickr_get_photos(country, season)
+		resp = flickr_get_photos(country, season)
+	resp.headers.add('Access-Control-Allow-Origin', '*')
+	return resp
 
 
 @app.route('/api/get_trip_cost/<country>/<fr>/<to>')
