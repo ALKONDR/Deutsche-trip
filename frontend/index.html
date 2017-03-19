@@ -9,6 +9,7 @@
 	<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
 	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/js/materialize.min.js"></script>
 	<script src="js/functions.js"></script>
@@ -17,8 +18,9 @@
 		<a href="http://localhost:5000/api/deutsche"><img src="images/deutsche.png" alt="deutsche bank" class="deutsche"></a>
 		<a href="http://localhost:5000/api/instagram"><img src="images/instagram.png" alt="instagram" class="instagram"></a>
 
-		<a href="#" class="btn waves-effect waves-light" id="sign_in">Sign in</a>
+		<!-- <a href="#" class="btn waves-effect waves-light" id="sign_in">Sign in</a> -->
 	</header>
+
 	<div class="parallax-container">
 		<div class="parallax"><img src="images/trip.jpg"></div>
 		<h1>DeuTrip</h1>
@@ -34,11 +36,30 @@
 
 	<div id="addModal" class="modal modal-fixed-footer">
 		<div class="modal-content">
+
 			<h4>Fill some information</h4>
+
+			<div class="row">
+				<div class="col s12">
+					<div class="row">
+						<div class="input-field col">
+							<input type="text" id="autocomplete-input" class="autocomplete">
+							<label for="autocomplete-input">Country</label>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<label for="start-day">Start day</label>
+			<input id="start-day" type="text" class="datepicker">
+
+			<label for="finish-day">Finish day</label>
+			<input id="finish-day" type="text" class="datepicker">
+
 		</div>
 		<div class="modal-footer">
 			<a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat ">Disagree</a>
-			<a href="saveAndClose();" class="modal-action modal-close waves-effect waves-green btn-flat ">Agree</a>
+			<a href="#!" onclick="saveAndClose();" class="modal-action modal-close waves-effect waves-green btn-flat ">Agree</a>
 		</div>
 	</div>
 
