@@ -14,22 +14,12 @@ app.config['SECRET_KEY'] = 'super secret key'
 
 @app.route('/')
 def homepage():
-	s = "<a href = '/api/deutsche'>auth deutshce</a> <br/> <a href = '/api/instagram'>auth inst</a> "
-	s += '<br/><br/>'
-
-	s += 'Deutsche bank authorization status: '
-	if 'db_token' in flask.session:
-	 	s += 'OK'
-	else:
-		s += '-'
-	s += '<br/>'
-
-	s += 'Instagram authorization: '
-	if 'inst_userid' in flask.session:
-		s += flask.session['inst_username']
-	else: 
-		s += '-'
-	return s
+	# if 'ppp' not in flask.session:
+	# 	flask.session['ppp'] = (pd.read_csv('PPP.csv', sep=',', delimiter = ',', index_col = 'Country')).to_dict()['Rate']
+	if 'sum_adj_cost' not in flask.session:
+		flask.session['sum_adj_cost'] = 0
+		flask.session['sum_duration'] = 0
+	return redirect('http://127.0.0.1:8080/')
 
 
 @app.route('/clear_session')
@@ -52,19 +42,16 @@ def deutsche_callback():
     db_token = db.get_token(code)
     if 'db_token' not in flask.session:
     	flask.session['db_token'] = db_token
-    #print db.transactions_stats(db.get_transactions(access_token))
     return redirect('/')
 
-# @app.route('/api/deutsche/transactions')
-# def deutsche_transactions():
-# 	return jsonify(db.get_transactions(flask.session['db_token']))
 
-@app.route('/api/deutsche/transactions')
-@app.route('/api/deutsche/transactions/<fr>/<to>')
-def deutsche_transactions(fr = None, to = None):
-	if fr is not None:
-		fr = datetime.date(int(fr[0:4]), int(fr[4:6]), int(fr[6:8]))
-		to = datetime.date(int(to[0:4]), int(to[4:6]), int(to[6:8]))
+#@app.route('/api/deutsche/transactions')
+@app.route('/api/deutsche/transactions/<country>/<fr>/<to>')
+def deutsche_transactions(country, fr, to):
+	fr = datetime.date(int(fr[0:4]), int(fr[4:6]), int(fr[6:8]))
+	to = datetime.date(int(to[0:4]), int(to[4:6]), int(to[6:8]))
+	duration = to - fr
+	duration = duration.days
 	transactions = db.get_transactions(flask.session['db_token'])
 	s = 0
 	selected_transactions = {'transactions':[], 'sum':0}
@@ -73,7 +60,18 @@ def deutsche_transactions(fr = None, to = None):
 		if (fr is None or ((d >= fr) and (d <= to))) and (t['amount'] < 0):
 			s += t['amount']
 			selected_transactions['transactions'].append(t)
-	selected_transactions['sum'] = s
+	selected_transactions['sum'] = round(s,0)
+	selected_transactions['duration'] = duration
+	selected_transactions['fr'] = fr
+	selected_transactions['to'] = to
+	selected_transactions['country'] = country	
+	coef = (pd.read_csv('PPP.csv', sep=',', delimiter = ',', index_col = 'Country')).to_dict()['Rate'][country]
+	selected_transactions['adj_sum'] = selected_transactions['sum']/coef
+	if 'sum_adj_cost' not in flask.session:
+		flask.session['sum_adj_cost'] = 0
+		flask.session['sum_duration'] = 0
+	flask.session['sum_adj_cost'] += selected_transactions['adj_sum']
+	flask.session['sum_duration'] += selected_transactions['duration']
 	resp = jsonify(selected_transactions)
 	resp.headers.add('Access-Control-Allow-Origin', '*')
 	return resp
@@ -104,6 +102,7 @@ def get_apistatus():
 	resp.headers.add('Access-Control-Allow-Origin', '*')
 	return resp
 
+
 # get JSON of user's photos in the selected period
 @app.route('/api/instagram/photos/<fr>/<to>')
 def inst_get_photos(fr, to):
@@ -114,9 +113,11 @@ def inst_get_photos(fr, to):
 	resp.headers.add('Access-Control-Allow-Origin', '*')
 	return resp
 
+
 @app.route('/api/instagram')
 def inst_auth():
 	return redirect(inst.make_authorization_url())
+
 
 @app.route('/api/instagram/callback')
 def inst_callback():
@@ -126,7 +127,6 @@ def inst_callback():
     code = request.args.get('code')
     if 'inst_userid' not in flask.session:
     	flask.session['inst_token'], flask.session['inst_userid'], flask.session['inst_username']  = inst.get_token(code)
-    #inst_token = inst.get_token(code)
     return redirect('/')
 
 
@@ -136,6 +136,7 @@ def flickr_get_photos(country, season):
 	resp = jsonify(p)
 	resp.headers.add('Access-Control-Allow-Origin', '*')
 	return resp
+
 
 @app.route('/api/get_photos_any/<country>/<fr>/<to>')
 def get_photos_any(country, fr, to):
@@ -153,6 +154,31 @@ def get_photos_any(country, fr, to):
 		elif month_from in [9,10,11]:
 			season = 'Fall'
 		return flickr_get_photos(country, season)
+
+
+@app.route('/api/get_trip_cost/<country>/<fr>/<to>')
+def get_trip_cost(country, fr, to):
+	to_date = datetime.date(int(to[0:4]), int(to[4:6]), int(to[6:8]))
+	fr_date = datetime.date(int(fr[0:4]), int(fr[4:6]), int(fr[6:8]))
+
+	duration = to_date - fr_date
+	duration = duration.days
+
+	if to_date < datetime.date.today():
+		t = deutsche_transactions(country, fr, to)
+	else:
+		coef = (pd.read_csv('PPP.csv', sep=',', delimiter = ',', index_col = 'Country')).to_dict()['Rate'][country]
+		avg_adj_cost_day = flask.session['sum_adj_cost']/flask.session['sum_duration']
+		cost_day = avg_adj_cost_day*coef
+		total_cost = cost_day * duration
+		t = jsonify({'sum' : round(total_cost,0),
+			'duration' : duration,
+			'fr' : fr_date,
+			'to' : to_date,
+			'country' : country})
+		t.headers.add('Access-Control-Allow-Origin', '*')
+	return t
+
 
 if __name__ == "__main__":
     app.run()
