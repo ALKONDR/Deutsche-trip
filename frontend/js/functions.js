@@ -14,6 +14,21 @@ const month2Num = {
 }
 
 const openAddModal = () => {
+	// let status = 0;
+	// $.ajax({
+	// 	url: 'http://localhost:5000/api/status',
+	// 	header:{'Access-Control-Allow-Origin': 'http://localhost:5000/'},
+	// 	success: function(result) {
+	// 		status += result.deutsche_status + result.instagram_status;
+	// 		// console.log(result);
+	// 	}
+	// }).done(() => {
+	// 	if (status == 2)
+	// 	else {
+	// 		let $toastContent = $('<span>Sign in with instagram and DB please</span>');
+	// 		Materialize.toast($toastContent, 5000);
+	// 	}
+	// });
 	$('#addModal').modal('open');
 }
 
@@ -23,7 +38,9 @@ const saveAndClose = () => {
 	let start = document.getElementById('start-day');
 	let finish = document.getElementById('finish-day');
 
-	console.log(country.value, start.value, finish.value);
+	// console.log(country.value, start.value, finish.value);
+
+	
 
 	$('#addModal').modal('close');
 }
