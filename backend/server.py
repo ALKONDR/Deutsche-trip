@@ -62,27 +62,29 @@ def deutsche_callback():
 @app.route('/api/deutsche/transactions')
 @app.route('/api/deutsche/transactions/<fr>/<to>')
 def deutsche_transactions(fr = None, to = None):
+	if fr is not None:
+		fr = datetime.date(int(fr[0:4]), int(fr[4:6]), int(fr[6:8]))
+		to = datetime.date(int(to[0:4]), int(to[4:6]), int(to[6:8]))
 	transactions = db.get_transactions(flask.session['db_token'])
 	s = 0
 	selected_transactions = {'transactions':[], 'sum':0}
-	for i in transactions.keys():
-		t = transactions[i]
-		print(t)
+	for t in transactions:
 		d = datetime.date(int(t['bookingDate'][0:4]), int(t['bookingDate'][5:7]), int(t['bookingDate'][8:10]))
 		if (fr is None or ((d >= fr) and (d <= to))) and (t['amount'] < 0):
 			s += t['amount']
 			selected_transactions['transactions'].append(t)
 	selected_transactions['sum'] = s
-	return jsonify(selected_transactions)
+	resp = jsonify(selected_transactions)
+	resp.headers.add('Access-Control-Allow-Origin', '*')
+	return resp
 
 
 # get list of countries
 @app.route('/api/countries')
 def get_countries():
     countries = json.load(open('countriesToCities.json'))
-
-    resp = flask.Response(sorted(list(countries.keys())))
-    resp.headers['Access-Control-Allow-Origin'] = 'http://localhost:8080'
+    resp = jsonify(sorted(list(countries.keys())))
+    resp.headers.add('Access-Control-Allow-Origin', '*')
     return resp
 
 
@@ -98,7 +100,9 @@ def get_apistatus():
 		s['instagram_username'] = flask.session['inst_username']
 	else:
 		s['instagram_status'] = False
-	return jsonify(s)
+	resp = jsonify(s)
+	resp.headers.add('Access-Control-Allow-Origin', '*')
+	return resp
 
 # get JSON of user's photos in the selected period
 @app.route('/api/instagram/photos/<fr>/<to>')
@@ -106,7 +110,9 @@ def inst_get_photos(fr, to):
 	fr = datetime.date(int(fr[0:4]), int(fr[4:6]), int(fr[6:8]))
 	to = datetime.date(int(to[0:4]), int(to[4:6]), int(to[6:8]))
 	p = inst.get_photos(flask.session['inst_userid'], flask.session['inst_token'], fr, to)
-	return jsonify(p)
+	resp = jsonify(p)
+	resp.headers.add('Access-Control-Allow-Origin', '*')
+	return resp
 
 @app.route('/api/instagram')
 def inst_auth():
