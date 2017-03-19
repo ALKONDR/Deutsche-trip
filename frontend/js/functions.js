@@ -35,7 +35,9 @@ const openAddModal = () => {
 const getDateQuery = (rawData) => {
 	let tmp = rawData.value.split(' ');
 	console.log(tmp);
-	return tmp[2] + month2Num[tmp[1]] + (tmp[0] < 10 ? '0' + tmp[0] : tmp[0]);
+	console.log(month2Num[tmp[1]]);
+	console.log(tmp[2] + month2Num[tmp[1]] + (tmp[0] < 10 ? ('0' + tmp[0]) : tmp[0]));
+	return tmp[2] + month2Num[tmp[1]] + (tmp[0] < 10 ? ('0' + tmp[0]) : tmp[0]);
 }
 
 var currentId = undefined;
@@ -158,11 +160,12 @@ const saveAndClose = () => {
 	let start = getDateQuery(document.getElementById('start-day'));
 	let finish = getDateQuery(document.getElementById('finish-day'));
 
-	// console.log(country.value, start.value, finish.value);
+	country = country.value;
+	console.log(country, start, finish);
 
 	let payments = undefined;
 	$.ajax({
-		url: `http://127.0.0.1:5000/api/deutsche/transactions/${start}/${finish}`,
+		url: `http://127.0.0.1:5000/api/deutsche/transactions/${country}/${start}/${finish}`,
 		header:{'Access-Control-Allow-Origin': 'http://127.0.0.1:5000/'},
 		success: function(result) {
 			payments = result;
